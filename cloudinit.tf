@@ -2,7 +2,7 @@ data "template_file" "cloud-init" {
   count    = "${var.cluster_size}"
   template = "${file("${path.module}/cloudinit/userdata-template.json")}"
 
-  vars {
+  vars = {
     environment = "${var.environment}"
     role        = "${var.role}"
     region      = "${var.region}"
@@ -18,7 +18,7 @@ data "template_file" "etcd_member_unit" {
   count    = "${var.cluster_size}"
   template = "${file("${path.module}/cloudinit/etcd_member_unit")}"
 
-  vars {
+  vars = {
     peer_name             = "peer-${count.index}"
     discovery_domain_name = "${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
     cluster_name          = "${var.role}"
@@ -29,7 +29,7 @@ data "template_file" "etcd_bootstrap_unit" {
   count    = "${var.cluster_size}"
   template = "${file("${path.module}/cloudinit/etcd_bootstrap_unit")}"
 
-  vars {
+  vars = {
     region                     = "${var.region}"
     peer_name                  = "peer-${count.index}"
     discovery_domain_name      = "${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
@@ -40,7 +40,7 @@ data "template_file" "etcd_bootstrap_unit" {
 data "template_file" "ntpdate_unit" {
   template = "${file("${path.module}/cloudinit/ntpdate_unit")}"
 
-  vars {
+  vars = {
     ntp_host = "${var.ntp_host}"
   }
 }

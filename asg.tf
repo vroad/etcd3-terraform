@@ -67,9 +67,9 @@ resource "aws_ebs_volume" "ssd" {
   availability_zone = "${element(var.azs, count.index)}"
   size              = 100
 
-  tags {
-    "Name"        = "peer-${count.index}-ssd.${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
-    "environment" = "${var.environment}"
-    "role"        = "peer-${count.index}-ssd.${var.role}"
+  tags = {
+    Name        = "peer-${count.index}-ssd.${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
+    environment = "${var.environment}"
+    role        = "peer-${count.index}-ssd.${var.role}"
   }
 }

@@ -3,7 +3,7 @@ resource "aws_vpc" "default" {
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags {
+  tags = {
     Name = "etcd3-test"
   }
 }
@@ -11,7 +11,7 @@ resource "aws_vpc" "default" {
 resource "aws_internet_gateway" "default" {
   vpc_id = "${aws_vpc.default.id}"
 
-  tags {
+  tags = {
     Name = "default"
   }
 }
@@ -22,7 +22,7 @@ resource "aws_subnet" "default" {
   cidr_block        = "${cidrsubnet(var.vpc_cidr, 2, count.index)}"
   availability_zone = "${element(var.azs, count.index)}"
 
-  tags {
+  tags = {
     Name = "default"
   }
 }
@@ -35,14 +35,14 @@ resource "aws_default_route_table" "default" {
     gateway_id = "${aws_internet_gateway.default.id}"
   }
 
-  tags {
+  tags = {
     Name = "default"
   }
 }
 
 resource "aws_default_network_acl" "default" {
   default_network_acl_id = "${aws_vpc.default.default_network_acl_id}"
-  subnet_ids             = ["${aws_subnet.default.*.id}"]
+  subnet_ids             = "${aws_subnet.default.*.id}"
 
   egress {
     protocol   = -1
@@ -62,7 +62,7 @@ resource "aws_default_network_acl" "default" {
     to_port    = 0
   }
 
-  tags {
+  tags = {
     Name = "default"
   }
 }
