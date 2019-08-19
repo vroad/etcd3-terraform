@@ -6,6 +6,10 @@ variable "instance_type" {
   default = "c4.large"
 }
 
+variable "ebs_volume_size" {
+  default = 100
+}
+
 variable "region" {
   default = "eu-west-1"
 }
