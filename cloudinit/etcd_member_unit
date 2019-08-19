@@ -1,5 +1,5 @@
 [Unit]
-Requires=coreos-metadata.service network-online.target
+Requires=coreos-metadata.service network-online.target etcd-bootstrap.service
 After=coreos-metadata.service network-online.target etcd-bootstrap.service
 Conflicts=etcd.service
 Conflicts=etcd2.service
