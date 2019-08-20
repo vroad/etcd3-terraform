@@ -7,7 +7,7 @@ resource "aws_route53_zone" "default" {
 
 resource "aws_route53_record" "default" {
   zone_id = "${aws_route53_zone.default.id}"
-  name    = "_etcd-server._tcp.${local.full_environment_name}"
+  name    = "_etcd-server-ssl._tcp.${local.full_environment_name}"
   type    = "SRV"
   ttl     = "1"
   records = "${formatlist("0 0 2380 %s", aws_route53_record.peers.*.name)}"

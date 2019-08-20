@@ -1,0 +1,8 @@
+storage:
+  files:
+    - path: /etc/kubernetes/pki/etcd/ca.crt
+      filesystem: root
+      contents:
+        remote:
+          url: s3://etcd3-files20190820012535676900000001/certs/ca.crt
+      mode: 0644

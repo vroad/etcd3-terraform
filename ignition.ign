@@ -1,0 +1,61 @@
+{
+    "ignition": {
+        "version": "2.0.0"
+    },
+    "storage": {
+        "files": [
+            {
+                "filesystem": "root",
+                "path": "/etc/kubernetes/pki/etcd/ca.crt",
+                "contents": {
+                    "source": "s3://etcd3-files20190820012535676900000001/certs/ca.crt",
+                    "verification": {}
+                },
+                "mode": 420
+            },
+            {
+                "filesystem": "root",
+                "path": "/etc/kubernetes/pki/apiserver-etcd-client.crt",
+                "contents": {
+                    "source": "s3://etcd3-files20190820012535676900000001/certs/${host}/apiserver-etcd-client.crt",
+                    "verification": {}
+                },
+                "mode": 420
+            }
+        ]
+    },
+    "systemd": {
+        "units": [
+            {
+                "name": "locksmithd.service",
+                "enable": false,
+                "mask": true
+            },
+            {
+                "name": "etcd-bootstrap.service",
+                "enable": true,
+                "contents": "[Unit]\nWants=network-online.target\nAfter=network-online.target\nBefore=etcd-member.service\n\n[Service]\nType=oneshot\nExecStartPre=/usr/bin/curl -L -o /tmp/etcd3-bootstrap https://etcd3-files20190820012535676900000001.s3.amazonaws.com/etcd3-bootstrap-linux-amd64\nExecStartPre=/usr/bin/chmod +x /tmp/etcd3-bootstrap\nRemainAfterExit=true\nExecStart=/tmp/etcd3-bootstrap \\\n    -ebs-volume-name=peer-0-ssd.etcd3-test.ap-northeast-1.i.staging.example.com \\\n    -block-device=/dev/xvdf \\\n    -aws-region=ap-northeast-1 \\\n    -mount-point=/var/lib/etcd\n\n[Install]\nWantedBy=etcd-member.service\n"
+            },
+            {
+                "name": "etcd-member.service",
+                "enable": true,
+                "dropins": [
+                    {
+                        "name": "20-clct-etcd-member.conf",
+                        "contents": "[Unit]\nRequires=coreos-metadata.service network-online.target etcd-bootstrap.service\nAfter=coreos-metadata.service network-online.target etcd-bootstrap.service\nConflicts=etcd.service\nConflicts=etcd2.service\n\n[Service]\nEnvironmentFile=/run/metadata/coreos\nEnvironment=\"ETCD_INITIAL_ADVERTISE_PEER_URLS=http://peer-0.etcd3-test.ap-northeast-1.i.staging.example.com:2380\"\nEnvironment=\"ETCD_INITIAL_CLUSTER_TOKEN=etcd3-test\"\nEnvironment=\"ETCD_ADVERTISE_CLIENT_URLS=http://peer-0.etcd3-test.ap-northeast-1.i.staging.example.com:2379\"\nEnvironment=\"ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379\"\nEnvironment=\"ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380\"\nEnvironment=\"ETCD_STRICT_RECONFIG_CHECK=true\"\nEnvironment=\"ETCD_NAME=peer-0\"\nEnvironment=\"ETCD_INITIAL_CLUSTER_STATE=new\"\nEnvironment=\"ETCD_DISCOVERY_SRV=etcd3-test.ap-northeast-1.i.staging.example.com\"\nExecStart=\nExecStart=/usr/lib/coreos/etcd-wrapper $ETCD_OPTS\n"
+                    }
+                ]
+            },
+            {
+                "name": "ntpdate.service",
+                "enable": true,
+                "contents": "[Service]\nType=oneshot\nExecStart=/sbin/ntpdate 0.europe.pool.ntp.org\n\n[Install]\nWantedBy=multi-user.target\n"
+            },
+            {
+                "name": "ntpdate.timer",
+                "enable": true,
+                "contents": "[Timer]\nOnCalendar=*:0/15\nRandomizedDelaySec=120\nOnBootSec=1min\n\n[Install]\nWantedBy=timers.target\n"
+            }
+        ]
+    }
+}

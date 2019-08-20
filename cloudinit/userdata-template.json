@@ -1,6 +1,98 @@
 {
     "ignition": {
-        "version": "2.0.0"
+        "config": {},
+        "security": {
+            "tls": {}
+        },
+        "timeouts": {},
+        "version": "2.2.0"
+    },
+    "networkd": {},
+    "passwd": {},
+    "storage": {
+        "files": [
+            {
+                "filesystem": "root",
+                "path": "/etc/kubernetes/pki/etcd/ca.crt",
+                "contents": {
+                    "source": "s3://${s3_bucket}/certs/ca.crt",
+                    "verification": {}
+                },
+                "mode": 420
+            },
+            {
+                "filesystem": "root",
+                "path": "/etc/kubernetes/pki/apiserver-etcd-client.crt",
+                "contents": {
+                    "source": "s3://${s3_bucket}/certs/${host}/apiserver-etcd-client.crt",
+                    "verification": {}
+                },
+                "mode": 420
+            },
+            {
+                "filesystem": "root",
+                "path": "/etc/kubernetes/pki/apiserver-etcd-client.key",
+                "contents": {
+                    "source": "s3://${s3_bucket}/certs/${host}/apiserver-etcd-client.key",
+                    "verification": {}
+                },
+                "mode": 420
+            },
+            {
+                "filesystem": "root",
+                "path": "/etc/kubernetes/pki/etcd/healthcheck-client.crt",
+                "contents": {
+                    "source": "s3://${s3_bucket}/certs/${host}/healthcheck-client.crt",
+                    "verification": {}
+                },
+                "mode": 420
+            },
+            {
+                "filesystem": "root",
+                "path": "/etc/kubernetes/pki/etcd/healthcheck-client.key",
+                "contents": {
+                    "source": "s3://${s3_bucket}/certs/${host}/healthcheck-client.key",
+                    "verification": {}
+                },
+                "mode": 420
+            },
+            {
+                "filesystem": "root",
+                "path": "/etc/kubernetes/pki/etcd/peer.crt",
+                "contents": {
+                    "source": "s3://${s3_bucket}/certs/${host}/peer.crt",
+                    "verification": {}
+                },
+                "mode": 420
+            },
+            {
+                "filesystem": "root",
+                "path": "/etc/kubernetes/pki/etcd/peer.key",
+                "contents": {
+                    "source": "s3://${s3_bucket}/certs/${host}/peer.key",
+                    "verification": {}
+                },
+                "mode": 420
+            },
+            {
+                "filesystem": "root",
+                "path": "/etc/kubernetes/pki/etcd/server.crt",
+                "contents": {
+                    "source": "s3://${s3_bucket}/certs/${host}/server.crt",
+                    "verification": {}
+                },
+                "mode": 420
+            },
+            {
+                "filesystem": "root",
+                "path": "/etc/kubernetes/pki/etcd/server.key",
+                "contents": {
+                    "source": "s3://${s3_bucket}/certs/${host}/server.key",
+                    "verification": {}
+                },
+                "mode": 420
+            }
+        ]
     },
     "systemd": {
         "units": [
@@ -14,17 +106,6 @@
                 "enable": true,
                 "contents": ${jsonencode(etcd_bootstrap_unit)
                 }
-            },
-            {
-                "name": "etcd-member.service",
-                "enable": true,
-                "dropins": [
-                    {
-                        "name": "20-clct-etcd-member.conf",
-                        "contents": ${jsonencode(etcd_member_unit)
-                        }
-                    }
-                ]
             },
             {
                 "name": "ntpdate.service",

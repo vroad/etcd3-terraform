@@ -11,6 +11,8 @@ data "template_file" "cloud-init" {
     etcd_bootstrap_unit = "${element(data.template_file.etcd_bootstrap_unit.*.rendered, count.index)}"
     ntpdate_unit        = "${data.template_file.ntpdate_unit.rendered}"
     ntpdate_timer_unit  = "${data.template_file.ntpdate_timer_unit.rendered}"
+    s3_bucket = "${aws_s3_bucket.files.id}"
+    host = "${local.hosts[count.index]}"
   }
 }
 
