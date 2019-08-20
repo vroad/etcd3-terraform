@@ -4,7 +4,7 @@ resource "aws_key_pair" "default" {
 }
 
 resource "aws_iam_role" "default" {
-  name = "${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
+  name = "${local.full_environment_name}"
 
   assume_role_policy = <<EOF
 {
@@ -24,13 +24,13 @@ EOF
 }
 
 resource "aws_iam_instance_profile" "default" {
-  name       = "${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
-  role       = "${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
+  name       = "${local.full_environment_name}"
+  role       = "${local.full_environment_name}"
   depends_on = ["aws_iam_role.default"]
 }
 
 resource "aws_iam_role_policy" "default" {
-  name       = "${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
+  name       = "${local.full_environment_name}"
   role       = "${aws_iam_role.default.name}"
   depends_on = ["aws_iam_role.default"]
 

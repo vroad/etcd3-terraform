@@ -1,6 +1,6 @@
 resource "aws_launch_configuration" "default" {
   count                       = "${var.cluster_size}"
-  name_prefix                 = "peer-${count.index}.${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}-"
+  name_prefix                 = "${local.hosts[count.index]}-"
   image_id                    = "${var.ami}"
   instance_type               = "${var.instance_type}"
   ebs_optimized               = true
@@ -18,7 +18,7 @@ resource "aws_launch_configuration" "default" {
 resource "aws_autoscaling_group" "default" {
   count                     = "${var.cluster_size}"
   availability_zones        = ["${element(var.azs, count.index)}"]
-  name                      = "peer-${count.index}.${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
+  name                      = "${local.hosts[count.index]}"
   max_size                  = 1
   min_size                  = 1
   desired_capacity          = 1
@@ -32,7 +32,7 @@ resource "aws_autoscaling_group" "default" {
 
   tag {
     key                 = "Name"
-    value               = "peer-${count.index}.${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
+    value               = "${local.hosts[count.index]}"
     propagate_at_launch = true
   }
 
@@ -68,7 +68,7 @@ resource "aws_ebs_volume" "ssd" {
   size              = "${var.ebs_volume_size}"
 
   tags = {
-    Name        = "peer-${count.index}-ssd.${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
+    Name        = "peer-${count.index}-ssd.${local.full_environment_name}"
     environment = "${var.environment}"
     role        = "peer-${count.index}-ssd.${var.role}"
   }

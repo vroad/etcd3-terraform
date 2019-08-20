@@ -22,7 +22,7 @@ resource "aws_elb" "internal" {
   }
 
   tags = {
-    Name        = "${var.role}.${var.region}.i.${var.environment}.${var.dns["domain_name"]}"
+    Name        = "${local.full_environment_name}"
     environment = "${var.environment}"
     role        = "${var.role}"
   }
